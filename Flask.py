@@ -28,10 +28,11 @@ def colorize():
     # Save the colorized image to the desktop
     desktop = os.path.expanduser("~/Desktop")
     output_path = os.path.join(desktop, "colorized_image.png")
-    plt.imsave(output_path, out_img_eccv16)
+    plt.imsave(output_path, out_img_siggraph17)
 
     # Send the colorized image as a response
     return send_file(output_path, mimetype='image/png')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
+# final test
