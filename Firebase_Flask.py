@@ -25,19 +25,19 @@ def colorization():
     try:
         file_name ='test1.png'
         user_id = "FyypNtnTh2gMySrHdVCGAqeJm2wk2"
-        authToken = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjAzZDA3YmJjM2Q3NWM2OTQyNzUxMGY2MTc0ZWIyZj' \
-                    'E2NTQ3ZDRhN2QiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuL' \
-                    'mdvb2dsZS5jb20vbXktc3RvcmUtN2NlOTEiLCJhdWQiOiJteS1zdG9yZS03Y2U5MSIsImF1' \
-                    'dGhfdGltZSI6MTY5ODMxOTI4OCwidXNlcl9pZCI6Inl5cE50blRoMmdNeVNySGRWQ0dBcWVK' \
-                    'bTJ3azIiLCJzdWIiOiJ5eXBOdG5UaDJnTXlTckhkVkNHQXFlSm0yd2syIiwiaWF0IjoxNjk4' \
-                    'MzE5Mjg4LCJleHAiOjE2OTgzMjI4ODgsImVtYWlsIjoidGVzdDVAdGVzdC5jb20iLCJlbWFp' \
-                    'bF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsid' \
-                    'GVzdDVAdGVzdC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.gv2uEB_e' \
-                    '6JdOYiIJXlL6P2FyMdiGLToXo0d0FTYuMmK-lin4ou5rSFArNps91hKadg0P_ChShGfCtklVJi' \
-                    '4MvI9e3K87Fcrq58CN05lapngcJiWqMYzrCLwxVYmDaIUDRBkTKQgqzPo2m8Egspjwc8Nzew_e' \
-                    'T3JDqHWaenogfys6VPNHMko_Rc1kCfm9yS_usZBb_QMue02ptgpyl1OhTybOgAmu3FgUQV-7Tew' \
-                    'cpzNBlvaansuVppZUpwSRoDatbs52Q0bHICIZDiqhLE2TY1OJjPN_N6_K0yVJbBLuvsL3h4kzpP' \
-                    's7o74FxzWgKJdXOwk1pzvsWoeumoHb607nwg'
+        authToken = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjBkMGU4NmJkNjQ3NDBjYWQyNDc1NjI4ZGEyZ' \
+                    'WM0OTZkZjUyYWRiNWQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3Vy' \
+                    'ZXRva2VuLmdvb2dsZS5jb20vbXktc3RvcmUtN2NlOTEiLCJhdWQiOiJteS1zdG9yZS0' \
+                    '3Y2U5MSIsImF1dGhfdGltZSI6MTY5ODMzNzc0OCwidXNlcl9pZCI6Inl5cE50blRoMmdN' \
+                    'eVNySGRWQ0dBcWVKbTJ3azIiLCJzdWIiOiJ5eXBOdG5UaDJnTXlTckhkVkNHQXFlSm0yd2' \
+                    'syIiwiaWF0IjoxNjk4MzM3NzQ4LCJleHAiOjE2OTgzNDEzNDgsImVtYWlsIjoidGVzdDVAd' \
+                    'GVzdC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZ' \
+                    'XMiOnsiZW1haWwiOlsidGVzdDVAdGVzdC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwY' \
+                    'XNzd29yZCJ9fQ.AR8IduM99qmzeceF4PPPfeUv_NcOY11aDw5AQ6p-bcgDoHawGdLdmRA4xz' \
+                    'mFJ7Zp8WYwejw3uida2nWv0c7W2YOkGy9W5TQHtlQZUx8BfmujfgMSVglW5El1gu9Vt3UtxH' \
+                    'o3z6VHr-No4fwBV0AIucU5VPcmbweyUcWJJXHsq_uBeE2KaPqh2YXWSdT9pza_kfDyyQmzFBL' \
+                    'Q-Q2jxATBrC5fVnBDBXSschEBdhuQVo4MtK1GHcVo3zIavVyvjG-QJ7mtlQFuSNnMZbNvg-Vo' \
+                    'gh7KxmgUONCacIFRDskAVr1VyuUII_Xr-2u5MRT6YGEh1cjM0e6LUbysIdJQKYMsQA'
 
         storage_url = "https://firebasestorage.googleapis.com/v0/b/my-store-7ce91.appspot.com/o/users%2Fhistory%2F" \
                       f"{user_id}%2F{file_name}?name={file_name}"
@@ -67,8 +67,15 @@ def colorization():
                 'Authorization': authToken
             }
 
+            # Save the colorized image to a temporary file
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_image:
+                plt.imsave(temp_image, out_img_siggraph17)
+                image_data = open(temp_image.name, 'rb').read()
+
+
+
              # Encode the image data in base64
-            image_data_json = base64.b64encode(out_img_siggraph17)
+            image_data_json = base64.b64encode(image_data)
 
 
 
