@@ -46,20 +46,43 @@ def colorization():
 
         if 'image' in request.files:
             image_file = request.files['image']
+            headers = request.headers
+            isPreprocess = headers.get('Preprocess')
+
+            if isPreprocess == "pre":
+                #sharp image
+                # Create a temporary directory to save the uploaded image
+                temp_dir = tempfile.mkdtemp()
+                temp_image_path = os.path.join(temp_dir, 'uploaded_image.png')
+                image_file.save(temp_image_path)
+
+                # Read the image
+
+                img = cv2.imread(temp_image_path, cv2.IMREAD_GRAYSCALE)
+
+                # Apply Gaussian blur to the color image
+                blurred = cv2.GaussianBlur(img, (0, 0), 3)
+
+                # Calculate the Unsharp mask by subtracting the blurred image from the original
+                unsharp_mask = cv2.addWeighted(img, 1.5, blurred, -0.5, -10)
+
+                # Save the Contrast image as a temporary file
+                temp_image_path = os.path.join(temp_dir, 'unsharp_image.png')
+                cv2.imwrite(temp_image_path, unsharp_mask)
+
+                # End sharp Image ##
 
             # Load and preprocess the image
-            img = load_img(image_file)
+            img = load_img(temp_image_path)
             (tens_l_orig, tens_l_rs) = preprocess_img(img, HW=(256, 256))
 
             # Colorize the image
             out_img_eccv16 = postprocess_tens(tens_l_orig, colorizer_eccv16(tens_l_rs))
             out_img_siggraph17 = postprocess_tens(tens_l_orig, colorizer_siggraph17(tens_l_rs))
 
-            # Read the image
-            #image_data = image_file.read()
-
             # Create a URL for the image in Firebase Storage
            # storage_location = f'users/history/{user_id}.json?auth={authToken}'
+
 
             # Set up the request headers
             headers = {
@@ -82,18 +105,20 @@ def colorization():
             # Make a POST request to upload the image to Firebase Storage
             response = requests.post(f'{storage_url}', headers=headers, data=image_data_json)
 
-           # print(image_data_json)
 
+           # print(image_data_json)
             if response.status_code == 200:
                 #print(print(image_data_json))
+                print(f'Image uploaded successfully to {storage_url}')
                 return f'Image uploaded successfully to {storage_url}'
             else:
                # print(image_data_json)
+                print(f'Failed to upload image. Status code: {response.status_code}')
                 return f'Failed to upload image. Status code: {response.status_code}'
         else:
+            print('Invalid request. Please provide user_id and the grayscale image in the request.')
             return 'Invalid request. Please provide user_id and the grayscale image in the request.'
     except Exception as e:
         return f'An error occurred: {str(e)}'
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
-#----
