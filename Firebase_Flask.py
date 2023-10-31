@@ -1,4 +1,5 @@
 import base64
+import io
 
 from flask import Flask, send_file,request
 from colorizers import *
@@ -24,37 +25,54 @@ colorizer_siggraph17 = siggraph17(pretrained=True).eval()
 def colorization():
     try:
         file_name ='test1.png'
-        user_id = "FyypNtnTh2gMySrHdVCGAqeJm2wk2"
-        authToken = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjBkMGU4NmJkNjQ3NDBjYWQyNDc1NjI4ZGEyZ' \
-                    'WM0OTZkZjUyYWRiNWQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3Vy' \
-                    'ZXRva2VuLmdvb2dsZS5jb20vbXktc3RvcmUtN2NlOTEiLCJhdWQiOiJteS1zdG9yZS0' \
-                    '3Y2U5MSIsImF1dGhfdGltZSI6MTY5ODMzNzc0OCwidXNlcl9pZCI6Inl5cE50blRoMmdN' \
-                    'eVNySGRWQ0dBcWVKbTJ3azIiLCJzdWIiOiJ5eXBOdG5UaDJnTXlTckhkVkNHQXFlSm0yd2' \
-                    'syIiwiaWF0IjoxNjk4MzM3NzQ4LCJleHAiOjE2OTgzNDEzNDgsImVtYWlsIjoidGVzdDVAd' \
-                    'GVzdC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZ' \
-                    'XMiOnsiZW1haWwiOlsidGVzdDVAdGVzdC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwY' \
-                    'XNzd29yZCJ9fQ.AR8IduM99qmzeceF4PPPfeUv_NcOY11aDw5AQ6p-bcgDoHawGdLdmRA4xz' \
-                    'mFJ7Zp8WYwejw3uida2nWv0c7W2YOkGy9W5TQHtlQZUx8BfmujfgMSVglW5El1gu9Vt3UtxH' \
-                    'o3z6VHr-No4fwBV0AIucU5VPcmbweyUcWJJXHsq_uBeE2KaPqh2YXWSdT9pza_kfDyyQmzFBL' \
-                    'Q-Q2jxATBrC5fVnBDBXSschEBdhuQVo4MtK1GHcVo3zIavVyvjG-QJ7mtlQFuSNnMZbNvg-Vo' \
-                    'gh7KxmgUONCacIFRDskAVr1VyuUII_Xr-2u5MRT6YGEh1cjM0e6LUbysIdJQKYMsQA'
+        #user_id = "FyypNtnTh2gMySrHdVCGAqeJm2wk2"
+        # authToken = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjBkMGU4NmJkNjQ3NDBjYWQyNDc1NjI4ZGEyZ' \
+        #             'WM0OTZkZjUyYWRiNWQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3Vy' \
+        #             'ZXRva2VuLmdvb2dsZS5jb20vbXktc3RvcmUtN2NlOTEiLCJhdWQiOiJteS1zdG9yZS0' \
+        #             '3Y2U5MSIsImF1dGhfdGltZSI6MTY5ODMzNzc0OCwidXNlcl9pZCI6Inl5cE50blRoMmdN' \
+        #             'eVNySGRWQ0dBcWVKbTJ3azIiLCJzdWIiOiJ5eXBOdG5UaDJnTXlTckhkVkNHQXFlSm0yd2' \
+        #             'syIiwiaWF0IjoxNjk4MzM3NzQ4LCJleHAiOjE2OTgzNDEzNDgsImVtYWlsIjoidGVzdDVAd' \
+        #             'GVzdC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZ' \
+        #             'XMiOnsiZW1haWwiOlsidGVzdDVAdGVzdC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwY' \
+        #             'XNzd29yZCJ9fQ.AR8IduM99qmzeceF4PPPfeUv_NcOY11aDw5AQ6p-bcgDoHawGdLdmRA4xz' \
+        #             'mFJ7Zp8WYwejw3uida2nWv0c7W2YOkGy9W5TQHtlQZUx8BfmujfgMSVglW5El1gu9Vt3UtxH' \
+        #             'o3z6VHr-No4fwBV0AIucU5VPcmbweyUcWJJXHsq_uBeE2KaPqh2YXWSdT9pza_kfDyyQmzFBL' \
+        #             'Q-Q2jxATBrC5fVnBDBXSschEBdhuQVo4MtK1GHcVo3zIavVyvjG-QJ7mtlQFuSNnMZbNvg-Vo' \
+        #             'gh7KxmgUONCacIFRDskAVr1VyuUII_Xr-2u5MRT6YGEh1cjM0e6LUbysIdJQKYMsQA'
 
-        storage_url = "https://firebasestorage.googleapis.com/v0/b/my-store-7ce91.appspot.com/o/users%2Fhistory%2F" \
-                      f"{user_id}%2F{file_name}?name={file_name}"
+
         #user_id = request.form.get('user_id')
 
 
-        if 'image' in request.files:
-            image_file = request.files['image']
+        if True:
+
             headers = request.headers
             isPreprocess = headers.get('Preprocess')
+            user_id = headers.get('User-id')
+            authToken = headers.get('Auth-Token')
 
+            storage_url = "https://firebasestorage.googleapis.com/v0/b/my-store-7ce91.appspot.com/o/users%2Fhistory%2F" \
+                          f"{user_id}%2F{file_name}?name={file_name}"
+
+            # reiceve encoded data (image)
+            print("HHHHHHHHHHHH1")
+            encoded_image = request.form['encoded-image']
+            print(f"encoded image : {encoded_image}")
+            print("HHHHHHHHHHHH2")
+            # decode the image
+            image_file = base64.b64decode(encoded_image)
+             # return the image back
+            image_stream = io.BytesIO(image_file).getvalue()
+            # Read the image from the BytesIO object
+            image = Image.open(io.BytesIO(image_stream))
+            # Create a temporary directory to save the uploaded image
+            temp_dir = tempfile.mkdtemp()
+            temp_image_path = os.path.join(temp_dir, 'uploaded_image.png')
+            image.save(temp_image_path)
+
+            print(f"image_file = {image}")
             if isPreprocess == "pre":
                 #sharp image
-                # Create a temporary directory to save the uploaded image
-                temp_dir = tempfile.mkdtemp()
-                temp_image_path = os.path.join(temp_dir, 'uploaded_image.png')
-                image_file.save(temp_image_path)
 
                 # Read the image
 
@@ -100,17 +118,16 @@ def colorization():
              # Encode the image data in base64
             image_data_json = base64.b64encode(image_data)
 
-
-
+            print(image_data_json)
             # Make a POST request to upload the image to Firebase Storage
             response = requests.post(f'{storage_url}', headers=headers, data=image_data_json)
 
-
-           # print(image_data_json)
+            print(image_data_json)
             if response.status_code == 200:
                 #print(print(image_data_json))
                 print(f'Image uploaded successfully to {storage_url}')
-                return f'Image uploaded successfully to {storage_url}'
+                return image_data_json
+               # return f'Image uploaded successfully to {storage_url}'
             else:
                # print(image_data_json)
                 print(f'Failed to upload image. Status code: {response.status_code}')
@@ -118,6 +135,7 @@ def colorization():
         else:
             print('Invalid request. Please provide user_id and the grayscale image in the request.')
             return 'Invalid request. Please provide user_id and the grayscale image in the request.'
+
     except Exception as e:
         return f'An error occurred: {str(e)}'
 if __name__ == '__main__':
